@@ -21,4 +21,18 @@ Use bookmarks, and smart prompting, to create your own Episode List/Queue.
   - can probably label the bookmark with metadata
 
 ### resources
-- https://crxjs.dev/vite-plugin/getting-started/react/create-project
+- build config
+  - https://crxjs.dev/vite-plugin/getting-started/react/create-project
+- extensions
+  - https://developer.chrome.com/docs/extensions/
+- css
+  - tailwind
+    - https://nerdcave.com/tailwind-cheat-sheet
+
+### phases
+
+- [ ] list bookmarks
+- [ ] select bookmark folder(s)
+- [ ] figure out something to do the matching
+- [ ] popup for when there is a match
+- [ ] popup allows you to update the bookmark
