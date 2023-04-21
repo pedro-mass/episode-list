@@ -25,6 +25,9 @@ Use bookmarks, and smart prompting, to create your own Episode List/Queue.
   - https://crxjs.dev/vite-plugin/getting-started/react/create-project
 - extensions
   - https://developer.chrome.com/docs/extensions/
+  - permissions: https://developer.chrome.com/docs/extensions/mv3/declare_permissions/
+  - bookmarks
+    - https://developer.chrome.com/docs/extensions/reference/bookmarks/
 - css
   - tailwind
     - https://nerdcave.com/tailwind-cheat-sheet
