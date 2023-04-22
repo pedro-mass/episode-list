@@ -35,8 +35,8 @@ Use bookmarks, and smart prompting, to create your own Episode List/Queue.
 
 ### phases
 
-- [ ] list bookmarks
-- [ ] select bookmark folder(s)
+- [x] list bookmarks
+- [x] select bookmark folder(s)
 - [ ] figure out something to do the matching
 - [ ] popup for when there is a match
 - [ ] popup allows you to update the bookmark
