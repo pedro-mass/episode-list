@@ -1,49 +1,107 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import React from "react";
+import _ from "lodash";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img
-          src={chrome.runtime.getURL(logo)}
-          className="App-logo"
-          alt="logo"
-        />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount(count => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
-  )
+export default function App() {
+  return <Config />;
 }
 
-export default App
+function Config() {
+  return (
+    <div>
+      <h1>Episode List</h1>
+
+      <section>
+        <h2>Folder to Monitor</h2>
+        <FolderPicker />
+      </section>
+
+      <section>
+        <h2>Enable Folders</h2>
+        {/* <BookmarksPicker bookmarks={bookmarks} /> */}
+      </section>
+    </div>
+  );
+}
+
+function FolderPicker() {
+  const [state, setState] = React.useState<{
+    status: "initial" | "ready";
+    folders: chrome.bookmarks.BookmarkTreeNode[];
+    selectedFolderId?: string | null;
+  }>({
+    status: "initial",
+    folders: [],
+    selectedFolderId: null,
+  });
+  const setSelectedFolderId = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setState((oldState) => ({
+      ...oldState,
+      selectedFolderId: e.target.value,
+    }));
+  };
+
+  React.useEffect(function getFolders() {
+    async function get() {
+      const folders =
+        (await getBookmarkBarContainer())?.children?.filter(isFolder) ?? [];
+
+      setState((oldState) => ({
+        ...oldState,
+        status: "ready",
+        folders,
+      }));
+    }
+    get();
+  }, []);
+
+  React.useEffect(
+    function updateFolderSelection() {
+      const bookmarks =
+        state.folders
+          ?.find((x) => x.id === state.selectedFolderId)
+          ?.children?.filter(_.negate(isFolder)) ?? [];
+
+      // pedro: shift state up a level so that the BookmarkPicker can access these bookmarks
+      console.log({
+        fn: "updateFolderSelection",
+        bookmarks,
+        state,
+      });
+    },
+    [state.selectedFolderId]
+  );
+
+  // console.log({ fn: "FolderPicker", state });
+
+  if (state.status !== "ready") return <p>Loading...</p>;
+
+  return (
+    <select
+      onChange={setSelectedFolderId}
+      value={state.selectedFolderId ?? undefined}
+    >
+      <option value="undefined">Select Folder</option>
+      {state.folders.map((x) => (
+        <option key={x.id} value={x.id}>
+          {x.title}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+async function getBookmarkContainers() {
+  return chrome.bookmarks.getTree();
+}
+
+async function getBookmarkBarContainer() {
+  return (await getBookmarkContainers())?.[0]?.children?.find((x) =>
+    /bookmarks bar/i.test(x.title)
+  );
+}
+
+function isFolder(bookmark: {
+  children?: chrome.bookmarks.BookmarkTreeNode[];
+}) {
+  return !_.isNil(bookmark?.children);
+}
