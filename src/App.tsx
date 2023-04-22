@@ -98,7 +98,7 @@ function FolderPicker() {
 }
 
 async function getSavedFolderId() {
-  return chrome.storage.local.get("folderId").then((x) => x.folderId);
+  return chrome.storage.local.get({ folderId: "" }).then((x) => x.folderId);
 }
 
 async function saveFolderId(folderId: string | null | undefined = null) {
