@@ -14,30 +14,33 @@ function Config() {
         <h2>Folder to Monitor</h2>
         <FolderPicker />
       </section>
-
-      <section>
-        <h2>Enable Folders</h2>
-        {/* <BookmarksPicker bookmarks={bookmarks} /> */}
-      </section>
     </div>
   );
 }
 
 function FolderPicker() {
   const [state, setState] = React.useState<{
-    status: "initial" | "ready";
+    statuses: {
+      foldersLoaded?: boolean;
+      folderIdLoaded?: boolean;
+    };
     folders: chrome.bookmarks.BookmarkTreeNode[];
     selectedFolderId?: string | null;
   }>({
-    status: "initial",
+    statuses: {
+      foldersLoaded: false,
+      folderIdLoaded: false,
+    },
     folders: [],
     selectedFolderId: null,
   });
   const setSelectedFolderId = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedFolderId = e.target.value;
     setState((oldState) => ({
       ...oldState,
-      selectedFolderId: e.target.value,
+      selectedFolderId,
     }));
+    saveFolderId(selectedFolderId);
   };
 
   React.useEffect(function getFolders() {
@@ -47,33 +50,37 @@ function FolderPicker() {
 
       setState((oldState) => ({
         ...oldState,
-        status: "ready",
+        statuses: {
+          ...oldState.statuses,
+          foldersLoaded: true,
+        },
         folders,
       }));
     }
     get();
   }, []);
 
-  React.useEffect(
-    function updateFolderSelection() {
-      const bookmarks =
-        state.folders
-          ?.find((x) => x.id === state.selectedFolderId)
-          ?.children?.filter(_.negate(isFolder)) ?? [];
+  React.useEffect(function retrieveSavedFolderId() {
+    getSavedFolderId()
+      .then((selectedFolderId) => {
+        setState((oldState) => ({
+          ...oldState,
+          selectedFolderId: String(selectedFolderId),
+        }));
+      })
+      .finally(() =>
+        setState((oldState) => ({
+          ...oldState,
+          statuses: {
+            ...oldState.statuses,
+            folderIdLoaded: true,
+          },
+        }))
+      );
+  }, []);
 
-      // pedro: shift state up a level so that the BookmarkPicker can access these bookmarks
-      console.log({
-        fn: "updateFolderSelection",
-        bookmarks,
-        state,
-      });
-    },
-    [state.selectedFolderId]
-  );
-
-  // console.log({ fn: "FolderPicker", state });
-
-  if (state.status !== "ready") return <p>Loading...</p>;
+  const isReady = _.values(state.statuses).every((x) => x);
+  if (!isReady) return <p>Loading...</p>;
 
   return (
     <select
@@ -88,6 +95,14 @@ function FolderPicker() {
       ))}
     </select>
   );
+}
+
+async function getSavedFolderId() {
+  return chrome.storage.local.get("folderId").then((x) => x.folderId);
+}
+
+async function saveFolderId(folderId: string | null | undefined = null) {
+  return chrome.storage.local.set({ folderId });
 }
 
 async function getBookmarkContainers() {

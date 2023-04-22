@@ -28,6 +28,7 @@ Use bookmarks, and smart prompting, to create your own Episode List/Queue.
   - permissions: https://developer.chrome.com/docs/extensions/mv3/declare_permissions/
   - bookmarks
     - https://developer.chrome.com/docs/extensions/reference/bookmarks/
+  - localStorage: https://developer.chrome.com/docs/extensions/reference/storage/
 - css
   - tailwind
     - https://nerdcave.com/tailwind-cheat-sheet
