@@ -2,16 +2,22 @@ import React from "react";
 import _ from "lodash";
 
 export default function App() {
-  return <Config />;
+  return (
+    <div className="w-44">
+      <Config />
+    </div>
+  );
 }
 
 function Config() {
   return (
     <div>
-      <h1>Episode List</h1>
+      <header className="mb-2 border-b-2 border-b-black border-opacity-30 text-center">
+        <h1 className="text-2xl font-bold">Episode List</h1>
+      </header>
 
-      <section>
-        <h2>Folder to Monitor</h2>
+      <section className="text-center">
+        <h2 className="text-lg">Folder to Monitor</h2>
         <FolderPicker />
       </section>
     </div>
@@ -84,6 +90,8 @@ function FolderPicker() {
 
   return (
     <select
+      className="w-full p-2"
+      disabled={!state.selectedFolderId}
       onChange={setSelectedFolderId}
       value={state.selectedFolderId ?? undefined}
     >
